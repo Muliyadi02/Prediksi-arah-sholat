@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Sholat Reminder — Waktu Salat, Kiblat &amp; Al-Qur'an</title>
+<title>Salatify — Waktu Salat, Kiblat &amp; Al-Qur'an</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Amiri:wght@400;700&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -358,6 +358,14 @@
     text-align:right;
     color:var(--cream);
   }
+  .ayah .latin{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    font-style:italic;
+    color:var(--cyan-bright);
+    margin-top:8px;
+    line-height:1.7;
+  }
   .ayah .translation{
     font-size:13.5px;
     color:var(--muted);
@@ -570,7 +578,7 @@
   <div class="arch">
     <div class="inner">
       <div class="eyebrow">Bismillah</div>
-      <h1>Sholat Reminder</h1>
+      <h1>Salatify</h1>
       <p class="tag">Waktu salat &middot; arah kiblat &middot; Al-Qur'an — dari data lokasi &amp; sumber terbuka</p>
       <div class="datebar">
         <span id="gregDate">--</span>
@@ -603,7 +611,8 @@
         <div style="margin-top:12px;">
           <label class="muted" for="methodSelect">Metode perhitungan</label>
           <select id="methodSelect">
-            <option value="20" selected>Kemenag RI (Indonesia)</option>
+            <option value="muh" selected>Muhammadiyah (Fajar &amp; Isya -18&deg;)</option>
+            <option value="20">Kemenag RI (Indonesia)</option>
             <option value="3">Muslim World League</option>
             <option value="5">Egyptian General Authority</option>
             <option value="4">Umm Al-Qura, Makkah</option>
@@ -611,10 +620,20 @@
             <option value="11">Singapura (MUIS)</option>
             <option value="8">Gulf Region</option>
           </select>
+          <div class="muted" id="methodSourceNote" style="font-size:11px; margin-top:8px; line-height:1.6;">
+            Kriteria Fajar &amp; Isya -18&deg; (mazhab Syafi'i untuk Ashar) telah dipakai Muhammadiyah sejak perubahan dari -20&deg;, dan tetap menjadi acuan pasca Munas Tarjih XXXII 2024 di Pekalongan (Kalender Hijriah Global Tunggal/KHGT), ditanfidzkan lewat Keputusan PP Muhammadiyah No. 86/KEP/I.0/B/2025.
+          </div>
         </div>
         <div class="row" style="margin-top:12px;">
           <div class="muted" id="notifStatus">Pengingat: nonaktif</div>
           <button class="btn secondary" id="btnNotif">Aktifkan Pengingat</button>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <label class="muted" style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer;">
+            <input type="checkbox" id="chkAdzan" checked style="accent-color:var(--gold); width:15px; height:15px;" />
+            🔊 Kumandangkan adzan saat waktu salat tiba
+          </label>
+          <button class="btn secondary" id="btnTestAdzan" style="padding:6px 10px; font-size:11.5px;">▶ Tes Suara</button>
         </div>
         <div id="prayerError"></div>
       </div>
@@ -748,6 +767,16 @@
       <div class="more-sub" id="sub-kalender" style="display:none;">
         <button class="back-link js-back-more">&larr; Kembali</button>
         <div class="card">
+          <label class="muted" for="hijriSourceSelect">Sumber kalender</label>
+          <select id="hijriSourceSelect" style="margin-top:6px;">
+            <option value="standar" selected>Standar (Kemenag/Umm al-Qura, via Aladhan)</option>
+            <option value="muhammadiyah">Muhammadiyah — Wujudul Hilal (estimasi)</option>
+          </select>
+          <div class="muted" id="hijriSourceNote" style="font-size:11px; margin-top:8px; line-height:1.6; display:none;">
+            Dihitung sendiri di perangkat memakai kriteria klasik Wujudul Hilal satu titik (ijtimak terjadi sebelum matahari terbenam &amp; hilal masih di atas ufuk saat itu, markaz Yogyakarta). Kalender resmi Muhammadiyah saat ini memakai Kalender Hijriah Global Tunggal (KHGT) yang memeriksa kriteria di seluruh dunia, sehingga hasil di sini <b>bisa berbeda 1 hari</b> — terutama di sekitar awal Ramadan, Syawal &amp; Zulhijah. Untuk kepastian, rujuk Maklumat resmi PP Muhammadiyah atau khgt.muhammadiyah.or.id.
+          </div>
+        </div>
+        <div class="card">
           <div class="hijri-cal-nav">
             <button id="hijriCalPrev" type="button" aria-label="Bulan sebelumnya">&#8249;</button>
             <div class="hijri-cal-title">
@@ -833,13 +862,14 @@
   </main>
 
   <footer class="note">
-    Data waktu salat &amp; Hijriah: Aladhan API &middot; Teks &amp; audio Al-Qur'an: AlQuran Cloud API (qari: Mishary Alafasy) &middot; Pencarian kota: OpenStreetMap Nominatim.<br/>
+    Data waktu salat &amp; Hijriah: Aladhan API &middot; Teks, transliterasi latin &amp; audio Al-Qur'an: AlQuran Cloud API (mushaf Utsmani lengkap tanda baca, qari: Mishary Alafasy, bismillah otomatis di awal surah) &middot; Audio adzan: Mishary Alafasy &middot; Pencarian kota: OpenStreetMap Nominatim.<br/>
     Aplikasi ini dibuat untuk penggunaan pribadi dan bukan afiliasi resmi dari produk manapun.
   </footer>
 
 </div>
 
 <audio id="audioPlayer"></audio>
+<audio id="adzanPlayer"></audio>
 
 <script>
 (function(){
@@ -850,7 +880,7 @@
     lat: null, lng: null, cityName: null,
     gpsAccuracy: null, // meter — presisi GPS dari perangkat (pos.coords.accuracy)
     watchId: null,
-    method: "20",
+    method: "muh",
     timings: null, timingsMeta: null,
     hijri: null,
     qiblaBearing: null,
@@ -868,16 +898,21 @@
     countdownTimer: null,
     notifEnabled: false,
     notifTimers: [],
+    playAdzan: true,
+    pendingAfterBismillah: null,
     tasbihCount: 0,
     doaRendered: false,
     asmaulRendered: false,
     hijriCalMonth: null,
     hijriCalYear: null,
-    hijriCalLoaded: false
+    hijriCalLoaded: false,
+    hijriSource: "standar" // "standar" (Aladhan) | "muhammadiyah" (hisab lokal wujudul hilal)
   };
 
   const $ = (sel) => document.querySelector(sel);
   const audioPlayer = $("#audioPlayer");
+  const adzanPlayer = $("#adzanPlayer");
+  const ADZAN_AUDIO_URL = "https://www.islamcan.com/audio/adhan/adhan_afassy.mp3";
 
   /* ---------------- TABS ---------------- */
   document.querySelectorAll(".tab-btn").forEach(btn=>{
@@ -962,12 +997,227 @@
   renderGregorian();
   loadHijri();
 
+  /* ---------------- HISAB MUHAMMADIYAH (Wujudul Hilal) ----------------
+     Posisi Matahari & Bulan dihitung langsung di perangkat (formula ringkas ala
+     Meeus, akurasi sekitar beberapa menit busur — cukup untuk kriteria
+     "hilal wujud / istikmal"). Markaz (titik acuan) memakai Yogyakarta,
+     sebagaimana lazim dipakai dalam hisab Wujudul Hilal Muhammadiyah.
+     Ini adalah PENDEKATAN/ESTIMASI, bukan pengganti Maklumat resmi PP Muhammadiyah. */
+  const MARKAZ = { lat: -7.801, lng: 110.364 };
+  const HIJRI_MONTHS_ID = ["Muharram","Safar","Rabiul Awal","Rabiul Akhir","Jumadil Awal","Jumadil Akhir","Rajab","Sya'ban","Ramadan","Syawal","Dzulqa'dah","Dzulhijjah"];
+
+  function toRad(d){return d*Math.PI/180;}
+  function toDeg(r){return r*180/Math.PI;}
+  function julianDay(date){ return date.getTime()/86400000 + 2440587.5; }
+  function normDeg(d){ d = d % 360; if(d<0) d+=360; return d; }
+
+  function sunPosition(jd){
+    const T = (jd - 2451545.0) / 36525;
+    const L0 = normDeg(280.46646 + 36000.76983*T + 0.0003032*T*T);
+    const M = normDeg(357.52911 + 35999.05029*T - 0.0001537*T*T);
+    const Mr = toRad(M);
+    const C = (1.914602 - 0.004817*T - 0.000014*T*T)*Math.sin(Mr)
+            + (0.019993 - 0.000101*T)*Math.sin(2*Mr)
+            + 0.000289*Math.sin(3*Mr);
+    const trueLong = L0 + C;
+    const omega = 125.04 - 1934.136*T;
+    const appLong = trueLong - 0.00569 - 0.00478*Math.sin(toRad(omega));
+    const eps0 = 23.439291 - 0.0130042*T;
+    const eps = eps0 + 0.00256*Math.cos(toRad(omega));
+    const lr = toRad(appLong), er = toRad(eps);
+    const ra = normDeg(toDeg(Math.atan2(Math.cos(er)*Math.sin(lr), Math.cos(lr))));
+    const dec = toDeg(Math.asin(Math.sin(er)*Math.sin(lr)));
+    return { lon: normDeg(appLong), ra, dec, eps };
+  }
+
+  function moonPosition(jd){
+    const T = (jd - 2451545.0) / 36525;
+    const Lp = normDeg(218.3164477 + 481267.88123421*T - 0.0015786*T*T);
+    const D  = normDeg(297.8501921 + 445267.1114034*T - 0.0018819*T*T);
+    const M  = normDeg(357.5291092 + 35999.0502909*T - 0.0001536*T*T);
+    const Mp = normDeg(134.9633964 + 477198.8675055*T + 0.0087414*T*T);
+    const F  = normDeg(93.2720950 + 483202.0175233*T - 0.0036539*T*T);
+    const Dr=toRad(D), Mr=toRad(M), Mpr=toRad(Mp), Fr=toRad(F);
+    const dL =
+        6.288774*Math.sin(Mpr) + 1.274027*Math.sin(2*Dr-Mpr) + 0.658314*Math.sin(2*Dr)
+      + 0.213618*Math.sin(2*Mpr) - 0.185116*Math.sin(Mr) - 0.114332*Math.sin(2*Fr)
+      + 0.058793*Math.sin(2*Dr-2*Mpr) + 0.057066*Math.sin(2*Dr-Mr-Mpr) + 0.053322*Math.sin(2*Dr+Mpr)
+      + 0.045758*Math.sin(2*Dr-Mr) - 0.040923*Math.sin(Mr-Mpr) - 0.034720*Math.sin(Dr)
+      - 0.030383*Math.sin(Mr+Mpr) + 0.015327*Math.sin(2*Dr-2*Fr) - 0.012528*Math.sin(Mpr+2*Fr);
+    const dB =
+        5.128122*Math.sin(Fr) + 0.280602*Math.sin(Mpr+Fr) + 0.277693*Math.sin(Mpr-Fr)
+      + 0.173237*Math.sin(2*Dr-Fr) + 0.055413*Math.sin(2*Dr+Fr-Mpr) + 0.046271*Math.sin(2*Dr-Fr-Mpr)
+      + 0.032573*Math.sin(2*Dr+Fr) + 0.017198*Math.sin(2*Mpr+Fr) + 0.009266*Math.sin(2*Dr+Mpr-Fr)
+      + 0.008822*Math.sin(2*Mpr-Fr);
+    const lon = normDeg(Lp + dL), lat = dB;
+    const eps = sunPosition(jd).eps;
+    const lr = toRad(lon), br = toRad(lat), er = toRad(eps);
+    const ra = normDeg(toDeg(Math.atan2(Math.sin(lr)*Math.cos(er) - Math.tan(br)*Math.sin(er), Math.cos(lr))));
+    const dec = toDeg(Math.asin(Math.sin(br)*Math.cos(er) + Math.cos(br)*Math.sin(er)*Math.sin(lr)));
+    return { lon, lat, ra, dec };
+  }
+
+  function altitudeOf(raDeg, decDeg, jd, lat, lng){
+    const D = jd - 2451545.0, T = D/36525;
+    const gmst = normDeg(280.46061837 + 360.98564736629*D + 0.000387933*T*T - (T*T*T)/38710000);
+    let H = normDeg(gmst + lng - raDeg);
+    if(H>180) H -= 360;
+    const Hr = toRad(H), latr = toRad(lat), decr = toRad(decDeg);
+    const sinAlt = Math.sin(latr)*Math.sin(decr) + Math.cos(latr)*Math.cos(decr)*Math.cos(Hr);
+    return toDeg(Math.asin(sinAlt));
+  }
+
+  function findSunset(gDate){
+    let lo = Date.UTC(gDate.getUTCFullYear(), gDate.getUTCMonth(), gDate.getUTCDate(), 9, 0, 0);
+    let hi = lo + 5*3600000;
+    const altAt = (ms)=>{
+      const jd = julianDay(new Date(ms));
+      const sun = sunPosition(jd);
+      return altitudeOf(sun.ra, sun.dec, jd, MARKAZ.lat, MARKAZ.lng) + 0.833;
+    };
+    let aLo = altAt(lo), aHi = altAt(hi);
+    if(aLo*aHi > 0){ lo -= 3*3600000; hi += 3*3600000; aLo = altAt(lo); aHi = altAt(hi); }
+    for(let i=0;i<40;i++){
+      const mid = (lo+hi)/2, aMid = altAt(mid);
+      if(aLo*aMid <= 0){ hi = mid; aHi = aMid; } else { lo = mid; aLo = aMid; }
+    }
+    return new Date((lo+hi)/2);
+  }
+
+  function findConjunction(gDate){
+    const base = gDate.getTime();
+    const g = (ms)=>{
+      const jd = julianDay(new Date(ms));
+      const sun = sunPosition(jd), moon = moonPosition(jd);
+      let diff = (moon.lon - sun.lon + 180) % 360; if(diff<0) diff+=360; diff -= 180;
+      return diff;
+    };
+    let lo = base - 2.5*86400000, hi = base + 2.5*86400000;
+    let gLo = g(lo), gHi = g(hi);
+    if(gLo*gHi > 0) return null;
+    for(let i=0;i<40;i++){
+      const mid=(lo+hi)/2, gMid=g(mid);
+      if(gLo*gMid<=0){ hi=mid; gHi=gMid; } else { lo=mid; gLo=gMid; }
+    }
+    return new Date((lo+hi)/2);
+  }
+
+  // Kriteria Wujudul Hilal pada tanggal Gregorian `gDate` (dianggap hari ke-29 bulan hijriah):
+  // true = hilal wujud → bulan baru mulai esok hari (bulan berjalan 29 hari)
+  // false = istikmal → bulan berjalan digenapkan 30 hari
+  const wujudCache = {};
+  function evalWujudulHilal(gDate){
+    const key = gDate.toISOString().slice(0,10);
+    if(wujudCache[key]!==undefined) return wujudCache[key];
+    const sunset = findSunset(gDate);
+    const ijtimak = findConjunction(gDate);
+    let result;
+    if(!ijtimak){
+      result = false;
+    }else{
+      const jd = julianDay(sunset);
+      const moon = moonPosition(jd);
+      const moonAlt = altitudeOf(moon.ra, moon.dec, jd, MARKAZ.lat, MARKAZ.lng);
+      result = (ijtimak.getTime() <= sunset.getTime()) && (moonAlt > 0);
+    }
+    wujudCache[key] = result;
+    return result;
+  }
+  function addDaysUTC(date, n){ return new Date(date.getTime() + n*86400000); }
+
+  // Rantai awal bulan Hijriah Muhammadiyah. Jangkar: 1 Muharram 1447 H = Kamis, 26 Juni 2025 M
+  // (Maklumat PP Muhammadiyah berdasarkan Kalender Hijriah Global Tunggal).
+  const muhChain = [ { hy: 1447, hm: 1, start: Date.UTC(2025,5,26), length: null } ];
+  function computeMonthLength(entry){
+    if(entry.length!=null) return entry.length;
+    const day29 = addDaysUTC(new Date(entry.start), 28);
+    entry.length = evalWujudulHilal(day29) ? 29 : 30;
+    return entry.length;
+  }
+  function extendChainForward(){
+    const last = muhChain[muhChain.length-1];
+    const len = computeMonthLength(last);
+    let hm = last.hm+1, hy = last.hy;
+    if(hm>12){ hm=1; hy++; }
+    muhChain.push({ hy, hm, start: last.start + len*86400000, length: null });
+  }
+  function extendChainBackward(){
+    const first = muhChain[0];
+    const wasWujud = evalWujudulHilal(addDaysUTC(new Date(first.start), -1));
+    const len = wasWujud ? 29 : 30;
+    let hm = first.hm-1, hy = first.hy;
+    if(hm<1){ hm=12; hy--; }
+    muhChain.unshift({ hy, hm, start: first.start - len*86400000, length: len });
+  }
+  function muhMonthEntryFor(gDateMs){
+    let guard = 0;
+    while(gDateMs < muhChain[0].start && guard++ < 600) extendChainBackward();
+    guard = 0;
+    while(true){
+      const last = muhChain[muhChain.length-1];
+      const len = computeMonthLength(last);
+      if(gDateMs < last.start + len*86400000) break;
+      extendChainForward();
+      if(guard++ > 600) break;
+    }
+    for(let i=muhChain.length-1;i>=0;i--){
+      const e = muhChain[i];
+      if(gDateMs >= e.start && gDateMs < e.start + computeMonthLength(e)*86400000) return e;
+    }
+    return muhChain[0];
+  }
+  function muhHijriForGregorian(gDate){
+    const ms = Date.UTC(gDate.getFullYear(), gDate.getMonth(), gDate.getDate());
+    const e = muhMonthEntryFor(ms);
+    const day = Math.round((ms - e.start)/86400000) + 1;
+    return { day, month: e.hm, year: e.hy, monthLength: computeMonthLength(e) };
+  }
+  function renderHijriCalendarMuhammadiyah(month, year){
+    const grid = $("#hijriCalGrid");
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const firstWeekday = new Date(year, month-1, 1).getDay();
+    const now = new Date();
+    const isCurrentMonth = now.getFullYear()===year && (now.getMonth()+1)===month;
+    const todayDate = now.getDate();
+    let html = "";
+    for(let i=0;i<firstWeekday;i++) html += `<div class="hijri-cal-cell empty"></div>`;
+    let firstH=null, lastH=null;
+    for(let gDay=1; gDay<=daysInMonth; gDay++){
+      const gDate = new Date(year, month-1, gDay);
+      const h = muhHijriForGregorian(gDate);
+      if(gDay===1) firstH = h;
+      if(gDay===daysInMonth) lastH = h;
+      const weekdayIdx = (firstWeekday+gDay-1)%7;
+      const isFriday = weekdayIdx===5;
+      const isToday = isCurrentMonth && gDay===todayDate;
+      const cls = ["hijri-cal-cell"];
+      if(isFriday) cls.push("friday");
+      if(isToday) cls.push("today");
+      html += `<div class="${cls.join(' ')}"><div class="g-day">${gDay}</div><div class="h-day">${h.day}</div></div>`;
+    }
+    grid.innerHTML = html;
+    let hijriLabel;
+    if(firstH.month===lastH.month && firstH.year===lastH.year){
+      hijriLabel = `${HIJRI_MONTHS_ID[firstH.month-1]} ${firstH.year} H`;
+    }else{
+      hijriLabel = `${HIJRI_MONTHS_ID[firstH.month-1]} ${firstH.year} &ndash; ${HIJRI_MONTHS_ID[lastH.month-1]} ${lastH.year} H`;
+    }
+    $("#hijriCalHijriTitle").innerHTML = hijriLabel;
+  }
+
   /* ---------------- KALENDER HIJRIAH (bulanan) ---------------- */
   const GREG_MONTHS_ID = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
   async function loadHijriCalendarMonth(month, year){
     const grid = $("#hijriCalGrid");
     grid.innerHTML = `<div class="muted" style="grid-column:1/-1; text-align:center; padding:20px 0;">Memuat kalender&hellip;</div>`;
     $("#hijriCalGregTitle").textContent = `${GREG_MONTHS_ID[month-1]} ${year}`;
+    if(state.hijriSource === "muhammadiyah"){
+      setTimeout(()=>{
+        try{ renderHijriCalendarMuhammadiyah(month, year); }
+        catch(e){ grid.innerHTML = `<div class="error-box" style="grid-column:1/-1;">Gagal menghitung kalender Muhammadiyah.</div>`; }
+      }, 10);
+      return;
+    }
     try{
       const res = await fetch(`https://api.aladhan.com/v1/gToHCalendar/${month}/${year}`);
       const json = await res.json();
@@ -1013,6 +1263,11 @@
     }
     $("#hijriCalHijriTitle").innerHTML = hijriLabel;
   }
+  $("#hijriSourceSelect").addEventListener("change", (e)=>{
+    state.hijriSource = e.target.value;
+    $("#hijriSourceNote").style.display = state.hijriSource==="muhammadiyah" ? "block" : "none";
+    if(state.hijriCalMonth) loadHijriCalendarMonth(state.hijriCalMonth, state.hijriCalYear);
+  });
   $("#hijriCalPrev").addEventListener("click", ()=>{
     state.hijriCalMonth--;
     if(state.hijriCalMonth<1){ state.hijriCalMonth=12; state.hijriCalYear--; }
@@ -1125,6 +1380,7 @@
 
   $("#methodSelect").addEventListener("change", (e)=>{
     state.method = e.target.value;
+    $("#methodSourceNote").style.display = state.method==="muh" ? "block" : "none";
     if(state.lat) fetchPrayerTimes();
   });
 
@@ -1142,7 +1398,15 @@
     $("#prayerError").innerHTML = "";
     try{
       const ts = Math.floor(Date.now()/1000);
-      const url = `https://api.aladhan.com/v1/timings/${ts}?latitude=${state.lat}&longitude=${state.lng}&method=${state.method}`;
+      // Muhammadiyah: bukan preset bawaan Aladhan, jadi dipakai metode custom (99)
+      // dengan sudut Fajar & Isya -18° (kriteria yang dipakai Muhammadiyah sejak perubahan
+      // dari -20°, dan masih menjadi acuan pasca Munas Tarjih XXXII 2024 di Pekalongan yang
+      // menetapkan Kalender Hijriah Global Tunggal/KHGT, ditanfidzkan lewat Keputusan PP
+      // Muhammadiyah No. 86/KEP/I.0/B/2025) & mazhab Syafi'i untuk Ashar (school=0).
+      const methodQS = state.method === "muh"
+        ? `method=99&methodSettings=18,null,18&school=0`
+        : `method=${state.method}`;
+      const url = `https://api.aladhan.com/v1/timings/${ts}?latitude=${state.lat}&longitude=${state.lng}&${methodQS}`;
       const res = await fetch(url);
       const json = await res.json();
       if(json.code !== 200) throw new Error("Respons API tidak valid");
@@ -1221,8 +1485,6 @@
   /* ---------------- QIBLA ---------------- */
   const KAABA = {lat:21.4225, lng:39.8262};
   const ALIGN_TOLERANCE_DEG = 5; // toleransi "sejajar dengan kiblat"
-  function toRad(d){return d*Math.PI/180;}
-  function toDeg(r){return r*180/Math.PI;}
   // selisih sudut terpendek dari a ke b (hasil -180..180)
   function shortestAngleDelta(a, b){
     return ((b - a + 540) % 360) - 180;
@@ -1488,13 +1750,14 @@
     $("#detailError").innerHTML = "";
     $("#detailLoading").style.display = "flex";
     try{
-      const url = `https://api.alquran.cloud/v1/surah/${s.number}/editions/quran-uthmani,id.indonesian,ar.alafasy`;
+      const url = `https://api.alquran.cloud/v1/surah/${s.number}/editions/quran-uthmani,id.indonesian,ar.alafasy,en.transliteration`;
       const res = await fetch(url);
       const json = await res.json();
-      const [arabic, translation, audio] = json.data;
+      const [arabic, translation, audio, translit] = json.data;
       const ayahs = arabic.ayahs.map((a,i)=>({
         number: a.numberInSurah,
         arabic: a.text,
+        latin: translit && translit.ayahs[i] ? translit.ayahs[i].text : "",
         translation: translation.ayahs[i] ? translation.ayahs[i].text : "",
         audio: audio.ayahs[i] ? audio.ayahs[i].audio : null
       }));
@@ -1507,6 +1770,39 @@
     }
   }
 
+  /* Surah tanpa bismillah saat pembacaan: Al-Fatihah (bismillah = ayat 1 itu sendiri)
+     dan At-Taubah (secara tradisi tidak dibuka dengan bismillah). */
+  function surahNeedsBismillah(){
+    const num = state.currentSurah ? state.currentSurah.number : null;
+    return num !== 1 && num !== 9;
+  }
+  function ayahNeedsBismillah(ayahNumber){
+    return ayahNumber === 1 && surahNeedsBismillah();
+  }
+  // Ayat global No.1 (Al-Fatihah ayat 1) adalah lafal bismillah itu sendiri — dipakai
+  // sebagai klip "Bismillah" yang didahulukan sebelum audio ayat pertama tiap surah.
+  function bismillahUrlFrom(anyAyahAudioUrl){
+    if(!anyAyahAudioUrl) return null;
+    const m = anyAyahAudioUrl.match(/^(.*\/)(\d+)(\.mp3.*)$/i);
+    if(!m) return null;
+    return `${m[1]}1${m[3]}`;
+  }
+  function playAyahAudio(ayahNumber, src){
+    if(!src) return;
+    if(ayahNeedsBismillah(ayahNumber)){
+      const bUrl = bismillahUrlFrom(src);
+      if(bUrl){
+        state.pendingAfterBismillah = src;
+        audioPlayer.src = bUrl;
+        audioPlayer.play();
+        return;
+      }
+    }
+    state.pendingAfterBismillah = null;
+    audioPlayer.src = src;
+    audioPlayer.play();
+  }
+
   function renderAyahs(ayahs){
     const container = $("#ayahContainer");
     container.innerHTML = "";
@@ -1515,10 +1811,11 @@
       div.className = "ayah";
       div.innerHTML = `
         <div class="arabic">${a.arabic}</div>
+        ${a.latin ? `<div class="latin">${a.latin}</div>` : ""}
         <div class="translation">${a.translation}</div>
         <div class="ayah-tools">
           <span class="ayah-num">Ayat ${a.number}</span>
-          <button class="btn secondary" style="padding:6px 10px; font-size:12px;" data-audio="${a.audio || ''}">▶ Putar</button>
+          <button class="btn secondary" style="padding:6px 10px; font-size:12px;" data-audio="${a.audio || ''}" data-ayahnum="${a.number}">▶ Putar</button>
         </div>
       `;
       container.appendChild(div);
@@ -1526,9 +1823,10 @@
     container.querySelectorAll("button[data-audio]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const src = btn.getAttribute("data-audio");
+        const ayahNum = parseInt(btn.getAttribute("data-ayahnum"), 10);
         if(!src) return;
-        audioPlayer.src = src;
-        audioPlayer.play();
+        state.playIndex = -1; // lepas dari antrean "putar semua" jika sedang berjalan
+        playAyahAudio(ayahNum, src);
       });
     });
   }
@@ -1536,6 +1834,7 @@
   $("#btnBackToList").addEventListener("click", ()=>{
     audioPlayer.pause();
     state.playIndex = -1;
+    state.pendingAfterBismillah = null;
     $("#quranDetailView").style.display = "none";
     $("#quranListView").style.display = "block";
   });
@@ -1548,14 +1847,33 @@
   $("#btnStopAll").addEventListener("click", ()=>{
     audioPlayer.pause();
     state.playIndex = -1;
+    state.pendingAfterBismillah = null;
   });
   function playCurrentInQueue(){
     if(state.playIndex < 0 || state.playIndex >= state.playQueue.length) return;
     const a = state.playQueue[state.playIndex];
+    // Dahulukan bismillah hanya di awal antrean (ayat pertama surah), lalu lanjut ke ayatnya.
+    if(state.playIndex === 0 && ayahNeedsBismillah(a.number)){
+      const bUrl = bismillahUrlFrom(a.audio);
+      if(bUrl){
+        state.pendingAfterBismillah = a.audio;
+        audioPlayer.src = bUrl;
+        audioPlayer.play();
+        return;
+      }
+    }
+    state.pendingAfterBismillah = null;
     audioPlayer.src = a.audio;
     audioPlayer.play();
   }
   audioPlayer.addEventListener("ended", ()=>{
+    if(state.pendingAfterBismillah){
+      const next = state.pendingAfterBismillah;
+      state.pendingAfterBismillah = null;
+      audioPlayer.src = next;
+      audioPlayer.play();
+      return;
+    }
     if(state.playIndex >= 0){
       state.playIndex++;
       playCurrentInQueue();
@@ -1580,10 +1898,23 @@
     }
   });
 
+  $("#chkAdzan").addEventListener("change", (e)=>{
+    state.playAdzan = e.target.checked;
+    if(!state.playAdzan) adzanPlayer.pause();
+  });
+  $("#btnTestAdzan").addEventListener("click", ()=>{
+    adzanPlayer.src = ADZAN_AUDIO_URL;
+    adzanPlayer.currentTime = 0;
+    adzanPlayer.play().catch(()=>{
+      $("#prayerError").innerHTML = `<div class="error-box">Tidak bisa memutar audio. Coba tekan tombol ini lagi setelah berinteraksi dengan halaman.</div>`;
+    });
+  });
+
   function schedulePrayerNotifications(){
     state.notifTimers.forEach(t=>clearTimeout(t));
     state.notifTimers = [];
     const now = new Date();
+    const ADZAN_PRAYERS = ["Fajr","Dhuhr","Asr","Maghrib","Isha"]; // waktu yang dikumandangkan adzan (Imsak & Terbit bukan waktu salat)
     DISPLAY_ORDER.forEach(key=>{
       if(key==="Sunrise") return; // terbit bukan waktu salat
       if(!state.timings[key]) return;
@@ -1592,11 +1923,18 @@
       if(delay <= 0) return;
       const timer = setTimeout(()=>{
         try{
-          new Notification("Waktu Salat", {
+          new Notification("Waktu Salat — Salatify", {
             body: `Sudah masuk waktu ${PRAYER_LABELS[key]} (${state.timings[key].split(" ")[0]})`,
             icon: undefined
           });
         }catch(e){}
+        if(state.playAdzan && ADZAN_PRAYERS.includes(key)){
+          try{
+            adzanPlayer.src = ADZAN_AUDIO_URL;
+            adzanPlayer.currentTime = 0;
+            adzanPlayer.play().catch(()=>{});
+          }catch(e){}
+        }
       }, delay);
       state.notifTimers.push(timer);
     });
